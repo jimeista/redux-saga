@@ -1,17 +1,30 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { Provider } from 'react-redux'
+import { createStore, compose, applyMiddleware } from 'redux'
+import { reducer } from './redux/reducer'
+import createSagaMiddleware from 'redux-saga'
+import root from './redux/sagas'
+
+import './index.css'
+import App from './App'
+
+// создаем обертку для компоненты передавая глобальное состояние store
+//используем сага, браузер state tracker мидлвары
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+const sagaMiddleware = createSagaMiddleware()
+const store = createStore(
+  reducer,
+  composeEnhancers(applyMiddleware(sagaMiddleware))
+)
+
+sagaMiddleware.run(root)
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <Provider store={store}>
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  </Provider>,
   document.getElementById('root')
-);
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+)
